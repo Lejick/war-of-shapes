@@ -2,11 +2,8 @@ package portal.component;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import portal.model.DataService;
 
 @Controller
 public class LevelController {
@@ -18,16 +15,13 @@ public class LevelController {
 
     public static final String INDEX_FORM = "index";
 
-    @Autowired
-    DataService dataService;
-
     @GetMapping("/floating")
-    public String upload(Model model) {
+    public String upload() {
         return FLOAT_FORM;
     }
 
     @GetMapping("/jumping")
-    public String jump(Model model) {
+    public String jump() {
         return JUMP_FORM;
     }
 

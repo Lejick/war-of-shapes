@@ -3,32 +3,26 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<style>
-canvas {
+  canvas {
     border:1px solid #d3d3d3;
     background-color: #f1f1f1;
 }
 </style>
 </head>
-<body onload="startGame()">
-
 <script src="webjars/jquery/2.2.4/jquery.min.js"></script>
 
+<body onload="getParameters()">
 <script>
 
 var myGamePiece;
-var maxHeight=270
-var maxWidth=480
-
-function startGame() {
-    myGamePiece = new component(30, 30, "red", 80, 75);
-    myGameArea.start();
-}
-
+var bottomY;
 var myGameArea = {
     canvas : document.createElement("canvas"),
-    start : function() {
+    start : function(maxHeight, maxWidth) {
+        myGamePiece = new component(30, 30, "red", 80, 75);
         this.canvas.width = maxWidth;
-        this.canvas.height = maxHeight;
+        this.canvas.height =maxHeight;
+        bottomY=maxHeight - 30;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateGameArea, 20);
@@ -49,7 +43,7 @@ document.addEventListener('keydown', function(event) {
          moveright();
     }
     else if (event.keyCode == 32) {
-    if(myGamePiece.bottomY-myGamePiece.y< 2){
+    if(bottomY-myGamePiece.y< 2){
         jump(-0.2);
         }
     }
@@ -57,9 +51,9 @@ document.addEventListener('keydown', function(event) {
 
 function component(width, height, color, x, y, type) {
     this.type = type;
-    this.frictionForce = 0.01;
     this.width = width;
     this.height = height;
+    this.frictionForce=0.01;
     this.x = x;
     this.y = y;
     this.speedX = 0;
@@ -68,7 +62,6 @@ function component(width, height, color, x, y, type) {
     this.gravity = 0.05;
     this.gravitySpeed = 0;
     this.bounce = 0.6;
-    this.bottomY=maxHeight - this.height
     this.update = function() {
         ctx = myGameArea.context;
         ctx.fillStyle = color;
@@ -80,16 +73,16 @@ function component(width, height, color, x, y, type) {
         this.y += this.speedY + this.gravitySpeed;
         this.hitBottom();
         this.endJump();
-        if(this.speedX>0 && this.y==this.bottomY){
+        if(this.speedX>0 && this.y==bottomY){
         this.speedX=this.speedX-this.frictionForce;
         }
-       if(this.speedX<0 && this.y==this.bottomY ){
+       if(this.speedX<0 && this.y==bottomY ){
         this.speedX=this.speedX+this.frictionForce;
         }
     }
     this.hitBottom = function() {
-    var rockright = maxWidth-this.width
-    var rockbottom = maxHeight - this.height;
+    var rockright = myGameArea.canvas.width - this.width
+    var rockbottom = myGameArea.canvas.height - this.height;
         if (this.y > rockbottom) {
             this.y = rockbottom;
             this.gravitySpeed = -(this.gravitySpeed * this.bounce);
@@ -112,36 +105,34 @@ function component(width, height, color, x, y, type) {
 }
 
 function moveleft() {
-if(myGamePiece.bottomY-myGamePiece.y < 2){
+if(bottomY-myGamePiece.y < 2){
     myGamePiece.speedX = myGamePiece.speedX - 0.1;
     }
 }
 
 function moveright() {
-if(myGamePiece.bottomY-myGamePiece.y < 2){
+if(bottomY-myGamePiece.y < 2){
    myGamePiece.speedX = myGamePiece.speedX + 0.1;
    }
 }
 
 function jump(n) {
+if(bottomY-myGamePiece.y < 2){
    logAction(n)
    myGamePiece.gravity = n;
    myGamePiece.jumpHeight = myGamePiece.y-5;
+   }
 }
-
 
 function updateGameArea() {
     myGameArea.clear();
     myGamePiece.newPos();
     myGamePiece.update();
 }
-
-
-
-
 </script>
 
 <script>
+
 function logAction(action) {
 $.ajax({
 type : "GET",
@@ -149,7 +140,6 @@ url : "/api/log/"+action,
 timeout : 100000,
 success : function(action) {
 console.log("SUCCESS: ", action);
-alert(response);
 },
 error : function(e) {
 console.log("ERROR: ", e);
@@ -159,6 +149,27 @@ console.log("DONE");
 }
 });
 }
+
+function getParameters() {
+$.ajax({
+type : "GET",
+url : "/api/level/normal/description",
+timeout : 100000,
+contentType: "application/json",
+dataType: "json",
+success : function(action) {
+console.log("SUCCESS: ", action);
+    myGameArea.start(action.maxHeight, action.maxWidth);
+},
+error : function(e) {
+console.log("ERROR: ", e);
+},
+done : function(e) {
+console.log("DONE");
+}
+});
+}
+
 </script>
 
 <br>
