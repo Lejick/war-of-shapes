@@ -16,6 +16,8 @@ canvas {
 <script>
 
 var myGamePiece;
+var maxHeight=270
+var maxWidth=480
 
 function startGame() {
     myGamePiece = new component(30, 30, "red", 80, 75);
@@ -25,8 +27,8 @@ function startGame() {
 var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
+        this.canvas.width = maxWidth;
+        this.canvas.height = maxHeight;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateGameArea, 20);
@@ -47,7 +49,9 @@ document.addEventListener('keydown', function(event) {
          moveright();
     }
     else if (event.keyCode == 32) {
+    if(myGamePiece.bottomY-myGamePiece.y< 2){
         jump(-0.2);
+        }
     }
 }, true);
 
@@ -64,6 +68,7 @@ function component(width, height, color, x, y, type) {
     this.gravity = 0.05;
     this.gravitySpeed = 0;
     this.bounce = 0.6;
+    this.bottomY=maxHeight - this.height
     this.update = function() {
         ctx = myGameArea.context;
         ctx.fillStyle = color;
@@ -75,16 +80,16 @@ function component(width, height, color, x, y, type) {
         this.y += this.speedY + this.gravitySpeed;
         this.hitBottom();
         this.endJump();
-        if(this.speedX>0 && this.y==myGameArea.canvas.height - this.height){
+        if(this.speedX>0 && this.y==this.bottomY){
         this.speedX=this.speedX-this.frictionForce;
         }
-       if(this.speedX<0 && this.y==myGameArea.canvas.height - this.height ){
+       if(this.speedX<0 && this.y==this.bottomY ){
         this.speedX=this.speedX+this.frictionForce;
         }
     }
     this.hitBottom = function() {
-    var rockright = myGameArea.canvas.width-this.width
-    var rockbottom = myGameArea.canvas.height - this.height;
+    var rockright = maxWidth-this.width
+    var rockbottom = maxHeight - this.height;
         if (this.y > rockbottom) {
             this.y = rockbottom;
             this.gravitySpeed = -(this.gravitySpeed * this.bounce);
@@ -107,11 +112,15 @@ function component(width, height, color, x, y, type) {
 }
 
 function moveleft() {
+if(myGamePiece.bottomY-myGamePiece.y < 2){
     myGamePiece.speedX = myGamePiece.speedX - 0.1;
+    }
 }
 
 function moveright() {
+if(myGamePiece.bottomY-myGamePiece.y < 2){
    myGamePiece.speedX = myGamePiece.speedX + 0.1;
+   }
 }
 
 function jump(n) {

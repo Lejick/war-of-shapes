@@ -38,7 +38,7 @@ public class LevelController {
 
     @ResponseBody
     @RequestMapping(value = "/api/log/{action}")
-    public void logAction(@PathVariable(value = "id") String action) {
+    public void logAction(@PathVariable(value = "action") String action) {
         LOGGER.info("action: " + action);
     }
 }
