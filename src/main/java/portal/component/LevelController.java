@@ -15,6 +15,8 @@ public class LevelController {
 
     public static final String INDEX_FORM = "index";
 
+    public static final String SERVER_BASED_FORM = "serverbased";
+
     @GetMapping("/floating")
     public String upload() {
         return FLOAT_FORM;
@@ -25,14 +27,13 @@ public class LevelController {
         return JUMP_FORM;
     }
 
+    @GetMapping("/serverbased")
+    public String serverbased() {
+        return SERVER_BASED_FORM;
+    }
+
     @GetMapping("/")
     public String index() {
         return INDEX_FORM;
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/api/log/{action}")
-    public void logAction(@PathVariable(value = "action") String action) {
-        LOGGER.info("action: " + action);
     }
 }
