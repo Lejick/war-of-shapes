@@ -1,41 +1,39 @@
 package portal.component;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.jbox2d.common.Vec2;
 
-@JsonSerialize
 public class Rectangle implements Figure {
     float height;
     float width;
-    float x;
-    float y;
+    Vec2 vec;
     float speedX;
     float speedY;
     String type="rectangle";
-    String color="red";
+    String color = "red";
 
-    public Rectangle(float heigth, float width, float x, float y) {
+    public Rectangle(float heigth, float width, Vec2 vec) {
         this.height = heigth;
         this.width = width;
-        this.x = x;
-        this.y = y;
+        this.vec = vec;
     }
 
-    public float getX() {
-        return x;
+    public Vec2 getVec() {
+        return vec;
     }
 
-    public void setX(float x) {
-        this.x = x;
+    public void setVec(Vec2 vec) {
+        this.vec = vec;
     }
 
-    public float getY() {
-        return y;
+    public RectangleDTO getDTO(){
+        RectangleDTO dto=new RectangleDTO();
+        dto.setX(vec.x);
+        dto.setY(vec.y);
+        dto.setHeight(height);
+        dto.setWidth(width);
+        return dto;
     }
-
-    public void setY(float y) {
-        this.y = y;
-    }
-
     public float getSpeedX() {
         return speedX;
     }

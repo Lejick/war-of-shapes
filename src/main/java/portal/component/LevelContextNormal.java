@@ -1,5 +1,6 @@
 package portal.component;
 
+import org.jbox2d.common.Vec2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,7 @@ public class LevelContextNormal {
     long lastActionTimeMillisecond = Calendar.getInstance().getTimeInMillis();
 
     public LevelContextNormal() {
-        rectangle = new Rectangle(30, 30, 100, 0);
+        rectangle = new Rectangle(30, 30, new Vec2(50,50));
         levelparameters = new LevelParameters(500, 500, 0.01f);
         rectangle.setSpeedX(2);
         rectangle.setSpeedY(2);
@@ -33,13 +34,13 @@ public class LevelContextNormal {
 
     @GetMapping("/api/object/state/")
     public @ResponseBody
-    Rectangle getObjectState() {
+    RectangleDTO getObjectState() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
         if (currentTime - lastActionTimeMillisecond > 20) {
             lastActionTimeMillisecond = currentTime;
             rectangle = updatePosition(rectangle);
         }
-        return rectangle;
+        return rectangle.getDTO();
     }
 
     @ResponseBody
@@ -63,20 +64,21 @@ public class LevelContextNormal {
         }
     }
     private Rectangle updatePosition(Rectangle rectangle) {
-        float x = rectangle.getX();
-        float y = rectangle.getY();
-        x = x + rectangle.getSpeedX();
-        y = y + rectangle.getSpeedY();
+        Vec2 vec=rectangle.getVec();
         float speedX = rectangle.getSpeedX();
         float speedY = rectangle.getSpeedY();
-        if (x <= 0 || x >= levelparameters.getMaxWidth() - rectangle.getWidth()) {
+
+        vec.x = vec.x + speedX;
+        vec.y = vec.y + speedY;
+
+        if (vec.x <= 0 || vec.x >= levelparameters.getMaxWidth() - rectangle.getWidth()) {
             speedX = -1 * speedX;
         }
-        if (y >= levelparameters.getMaxHeight()-rectangle.getHeight() || y <= 0) {
+        if (vec.y >= levelparameters.getMaxHeight()-rectangle.getHeight() || vec.y <= 0) {
             speedY = -1 * speedY;
         }
-        rectangle.setX(x);
-        rectangle.setY(y);
+        rectangle.setVec(vec);
+        rectangle.setVec(vec);
         rectangle.setSpeedX(speedX);
         rectangle.setSpeedY(speedY);
         return rectangle;
