@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <style>
+  canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+    </head>
+    <script src="webjars/jquery/2.2.4/jquery.min.js"></script>
+    <body onload="getParameters()">
+    <script>
+
+var myGamePiece;
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function(maxHeight, maxWidth) {
+        this.canvas.width = maxWidth;
+        this.canvas.height =maxHeight;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(getObjectState, 20);
+    },
+    stop : function() {
+        clearInterval(this.interval);
+    },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+document.addEventListener('keydown', function(event) {
+    sendAction(event.keyCode)
+}, true);
+
+function drawObject(height, width, color,x, y, type){
+        myGameArea.clear();
+        ctx = myGameArea.context;
+        if (type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+        } else if(type == "rectangle"){
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+        }
+}
+</script>
+
+<script>
+function getParameters() {
+$.ajax({
+type : "GET",
+url : "/api/level/normal/description",
+timeout : 100000,
+contentType: "application/json",
+dataType: "json",
+success : function(action) {
+console.log("SUCCESS: ", action);
+    myGameArea.start(action.maxHeight, action.maxWidth);
+},
+error : function(e) {
+console.log("ERROR: ", e);
+},
+done : function(e) {
+console.log("DONE");
+}
+});
+}
+
+function getObjectState() {
+$.ajax({
+type : "GET",
+url : "/api/object/state/",
+timeout : 100000,
+contentType: "application/json",
+dataType: "json",
+success : function(obj) {
+console.log("SUCCESS: ", obj);
+   drawObject(obj.height, obj.width, obj.color, obj.x, obj.y, obj.type);
+},
+error : function(e) {
+console.log("ERROR: ", e);
+},
+done : function(e) {
+console.log("DONE");
+}
+});
+}
+
+function sendAction(action) {
+$.ajax({
+type : "GET",
+url : "/api/action/"+action,
+timeout : 100000,
+success : function(action) {
+console.log("SUCCESS: ", action);
+},
+error : function(e) {
+console.log("ERROR: ", e);
+},
+done : function(e) {
+console.log("DONE");
+}
+});
+}
+
+</script>
+
+    <br>
+    <p>Try to control the red square. 'A' = left, 'D' = right, 'Space' = jump</p>
+    </body>
+</html>

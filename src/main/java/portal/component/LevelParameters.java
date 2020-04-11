@@ -3,13 +3,13 @@ package portal.component;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize
-public class LevelDesription {
+public class LevelParameters {
     int maxHeight;
     int maxWidth;
     float frictionForce;
 
 
-    public LevelDesription(int maxHeight, int maxWidth, float frictionForce) {
+    public LevelParameters(int maxHeight, int maxWidth, float frictionForce) {
         this.maxHeight = maxHeight;
         this.maxWidth = maxWidth;
         this.frictionForce = frictionForce;

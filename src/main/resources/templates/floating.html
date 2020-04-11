@@ -115,7 +115,6 @@ function moveright() {
 }
 
 function jump(n) {
-   logAction(n)
    myGamePiece.gravity = n;
    myGamePiece.jumpHeight = myGamePiece.y-5;
 }
@@ -131,27 +130,6 @@ function updateGameArea() {
 
 
 </script>
-
-<script>
-function logAction(action) {
-$.ajax({
-type : "GET",
-url : "/api/log/"+action,
-timeout : 100000,
-success : function(action) {
-console.log("SUCCESS: ", action);
-alert(response);
-},
-error : function(e) {
-console.log("ERROR: ", e);
-},
-done : function(e) {
-console.log("DONE");
-}
-});
-}
-</script>
-
 <br>
 <p>Try to control the red square. 'A' = left, 'D' = right, 'Space' = jump</p>
 

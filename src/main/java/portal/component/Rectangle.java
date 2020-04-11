@@ -1,33 +1,38 @@
 package portal.component;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+@JsonSerialize
 public class Rectangle implements Figure {
-    int  height;
-    int width;
-    int x;
-    int y;
+    float height;
+    float width;
+    float x;
+    float y;
     float speedX;
     float speedY;
+    String type="rectangle";
+    String color="red";
 
-    public Rectangle(int heigth, int width, int x, int y) {
+    public Rectangle(float heigth, float width, float x, float y) {
         this.height = heigth;
         this.width = width;
         this.x = x;
         this.y = y;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
@@ -47,7 +52,7 @@ public class Rectangle implements Figure {
         this.speedY = speedY;
     }
 
-    public int getHeight() {
+    public float getHeight() {
         return height;
     }
 
@@ -55,11 +60,27 @@ public class Rectangle implements Figure {
         this.height = height;
     }
 
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
     public void setWidth(int width) {
         this.width = width;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }
