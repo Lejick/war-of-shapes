@@ -13,6 +13,8 @@ public class LevelController {
 
     public static final String JUMP_FORM = "jumping";
 
+    public static final String ROLLING_BALL_FORM = "rollingBall";
+
     public static final String INDEX_FORM = "index";
 
     public static final String SERVER_BASED_FORM = "serverbased";
@@ -30,6 +32,11 @@ public class LevelController {
     @GetMapping("/serverbased")
     public String serverbased() {
         return SERVER_BASED_FORM;
+    }
+
+    @GetMapping("/rollingBall")
+    public String srollingBall() {
+        return ROLLING_BALL_FORM;
     }
 
     @GetMapping("/")
