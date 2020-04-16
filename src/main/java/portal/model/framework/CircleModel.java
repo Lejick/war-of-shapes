@@ -4,7 +4,7 @@ import org.jbox2d.common.Vec2;
 import portal.component.Figure;
 import portal.component.RectangleDTO;
 
-public class Circle implements Figure {
+public class CircleModel implements Figure {
     float radius;
     Vec2 vec;
     float speedX;
@@ -12,7 +12,7 @@ public class Circle implements Figure {
     String type="circle";
     String color = "green";
 
-    public Circle(float radius, Vec2 vec) {
+    public CircleModel(float radius, Vec2 vec) {
         this.vec = vec;
         this.radius=radius;
     }

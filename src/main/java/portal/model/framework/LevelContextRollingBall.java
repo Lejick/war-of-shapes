@@ -17,12 +17,12 @@ import java.util.Calendar;
 @Controller
 public class LevelContextRollingBall {
     private final Logger LOGGER = LoggerFactory.getLogger(LevelContextRollingBall.class);
-    Circle rectangle;
+    CircleModel rectangle;
     LevelParameters levelparameters;
     long lastActionTimeMillisecond = Calendar.getInstance().getTimeInMillis();
 
     public LevelContextRollingBall() {
-        rectangle = new Circle(30,  new Vec2(50,50));
+        rectangle = new CircleModel(30,  new Vec2(50,50));
         levelparameters = new LevelParameters(500, 500, 0.01f);
         rectangle.setSpeedX(2);
         rectangle.setSpeedY(2);
@@ -66,7 +66,7 @@ public class LevelContextRollingBall {
             rectangle.setSpeedX(speedX);
         }
     }
-    private Circle updatePosition(Circle rectangle) {
+    private CircleModel updatePosition(CircleModel rectangle) {
         Vec2 vec=rectangle.getVec();
         float speedX = rectangle.getSpeedX();
         float speedY = rectangle.getSpeedY();
