@@ -24,13 +24,11 @@
  */
 package portal.model;
 
-import org.dyn4j.dynamics.Body;
-import org.dyn4j.dynamics.Step;
-import org.dyn4j.dynamics.StepAdapter;
-import org.dyn4j.dynamics.World;
+import org.dyn4j.dynamics.*;
 import org.dyn4j.dynamics.contact.ContactAdapter;
 import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.dynamics.contact.PersistedContactPoint;
+import org.dyn4j.geometry.Circle;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 import portal.model.framework.SimulationBody;
@@ -227,8 +225,11 @@ public class SimplePlatformer extends SimulationFrame {
 			wheel.setColor(WHEEL_OFF_COLOR);
 		}
 		super.update(g, elapsedTime);
+		Circle circle=(Circle) wheel.getFixture(0).getShape();
+		List<BodyFixture> list=wheel.getFixtures();
+		System.out.println(circle.getCenter().x  + ";" + circle.getCenter().y);
 	}
-	
+
 	/**
 	 * Entry point for the example application.
 	 * @param args command line arguments

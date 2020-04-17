@@ -68,8 +68,8 @@ public class SimplePlatformerLevel {
 	
 	private SimulationBody wheel;
 	
-	private final AtomicBoolean leftPressed = new AtomicBoolean(false);
-	private final AtomicBoolean rightPressed = new AtomicBoolean(false);
+	public final AtomicBoolean leftPressed = new AtomicBoolean(false);
+	public final AtomicBoolean rightPressed = new AtomicBoolean(false);
 	private final AtomicBoolean isOnGround = new AtomicBoolean(false);
 	
 	private static final Color WHEEL_OFF_COLOR = Color.MAGENTA;
@@ -112,10 +112,10 @@ public class SimplePlatformerLevel {
 	/**
 	 * Creates game objects and adds them to the world.
 	 */
-	protected void initializeWorld() {
+	protected void initializeWorld(float height, float width) {
 		// the floor
 		SimulationBody floor = new SimulationBody();
-		floor.addFixture(Geometry.createRectangle(50.0, 0.2));
+		floor.addFixture(Geometry.createRectangle(width, 0.2));
 		floor.setMass(MassType.INFINITE);
 		floor.translate(0, -3);
 		floor.setUserData(FLOOR_BODY);
@@ -136,13 +136,13 @@ public class SimplePlatformerLevel {
 		
 		// some bounding shapes
 		SimulationBody right = new SimulationBody();
-		right.addFixture(Geometry.createRectangle(0.2, 20));
+		right.addFixture(Geometry.createRectangle(0.2,  height));
 		right.setMass(MassType.INFINITE);
 		right.translate(10, 7);
 		this.world.addBody(right);
 		
 		SimulationBody left = new SimulationBody();
-		left.addFixture(Geometry.createRectangle(0.2, 20));
+		left.addFixture(Geometry.createRectangle(0.2, height));
 		left.setMass(MassType.INFINITE);
 		left.translate(-10, 7);
 		this.world.addBody(left);
@@ -204,7 +204,7 @@ public class SimplePlatformerLevel {
 		});
 	}
 	
-	protected void update(Graphics2D g, double elapsedTime) {
+	protected void update(double elapsedTime) {
 		// apply a torque based on key input
 		if (this.leftPressed.get()) {
 			wheel.applyTorque(Math.PI / 2);
@@ -217,11 +217,22 @@ public class SimplePlatformerLevel {
 		} else {
 			wheel.setColor(WHEEL_OFF_COLOR);
 		}
-		updateWorld(g, elapsedTime);
+		updateWorld(elapsedTime);
 	}
 
-	protected void updateWorld(Graphics2D g, double elapsedTime) {
+	protected void updateWorld(double elapsedTime) {
 		// update the world with the elapsed time
 		this.world.update(elapsedTime);
 	}
+
+	public SimulationBody getWheel() {
+		return wheel;
+	}
+
+	public void setWheel(SimulationBody wheel) {
+		this.wheel = wheel;
+	}
+
+
+
 }

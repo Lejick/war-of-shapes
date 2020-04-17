@@ -1,27 +1,28 @@
 package portal.model.framework;
 
+import org.dyn4j.geometry.Vector2;
 import org.jbox2d.common.Vec2;
 import portal.component.Figure;
 import portal.component.RectangleDTO;
 
 public class CircleModel implements Figure {
-    float radius;
-    Vec2 vec;
-    float speedX;
-    float speedY;
+    double radius;
+    Vector2 vec;
+    double speedX;
+    double speedY;
     String type="circle";
     String color = "green";
 
-    public CircleModel(float radius, Vec2 vec) {
+    public CircleModel(float radius, Vector2 vec) {
         this.vec = vec;
         this.radius=radius;
     }
 
-    public Vec2 getVec() {
+    public Vector2 getVec() {
         return vec;
     }
 
-    public void setVec(Vec2 vec) {
+    public void setVec(Vector2 vec) {
         this.vec = vec;
     }
 
@@ -33,27 +34,27 @@ public class CircleModel implements Figure {
         return dto;
     }
 
-    public float getSpeedX() {
+    public double getSpeedX() {
         return speedX;
     }
 
-    public void setSpeedX(float speedX) {
+    public void setSpeedX(double speedX) {
         this.speedX = speedX;
     }
 
-    public float getSpeedY() {
+    public double getSpeedY() {
         return speedY;
     }
 
-    public void setSpeedY(float speedY) {
+    public void setSpeedY(double speedY) {
         this.speedY = speedY;
     }
 
-    public float getRadius() {
+    public double getRadius() {
         return radius;
     }
 
-    public void setRadius(float radius) {
+    public void setRadius(double radius) {
         this.radius = radius;
     }
 
