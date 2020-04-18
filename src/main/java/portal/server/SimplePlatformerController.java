@@ -1,6 +1,5 @@
 package portal.server;
 
-import org.dyn4j.dynamics.Body;
 import org.dyn4j.geometry.Circle;
 import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
