@@ -35,21 +35,19 @@ document.addEventListener('keydown', function(event) {
     sendAction(event.keyCode)
 }, true);
 
-function drawObject(height, width, color, radius, x, y, type){
-        myGameArea.clear();
-        ctx = myGameArea.context;
-        if (type == "text") {
-            ctx.font = this.width + " " + this.height;
-            ctx.fillStyle = color;
-            ctx.fillText(text, x, y);
-        } else if(type == "rectangle"){
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, width, height);
-        } else if(type == "circle"){
+function drawObjects(obj){
+ myGameArea.clear();
+for (i in obj){
+ctx = myGameArea.context;
+ if(obj[i].type == "rectangle"){
+            ctx.fillStyle = obj[i].color;
+            ctx.fillRect(obj[i].x, obj[i].y, obj[i].width, obj[i].height);
+        } else if(obj[i].type == "circle"){
             var circle = new Path2D();
-            circle.arc(x, y, radius, 0, 2 * Math.PI);;
-         ctx.fillStyle = color;
+            circle.arc(obj[i].x, obj[i].y, obj[i].radius, 0, 2 * Math.PI);;
+         ctx.fillStyle = obj[i].color;
          ctx.fill(circle);
+        }
         }
 }
 </script>
@@ -84,10 +82,7 @@ contentType: "application/json",
 dataType: "json",
 success : function(obj) {
 console.log("SUCCESS: ", obj);
-   for(i in obj)
-  {
-   drawObject(obj[i].height, obj[i].width,obj[i].color,obj[i].radius, obj[i].x, obj[i].y, obj[i].type);
-   }
+   drawObjects(obj);
 },
 error : function(e) {
 console.log("ERROR: ", e);
