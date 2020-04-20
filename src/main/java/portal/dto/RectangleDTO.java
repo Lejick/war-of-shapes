@@ -3,7 +3,7 @@ package portal.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize
-public class RectangleDTO {
+public class RectangleDTO implements FigureDTO{
     double height;
     double width;
     double x;

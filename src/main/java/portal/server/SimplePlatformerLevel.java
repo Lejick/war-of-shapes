@@ -71,13 +71,15 @@ public class SimplePlatformerLevel {
 	public final AtomicBoolean rightPressed = new AtomicBoolean(false);
 	private final AtomicBoolean isOnGround = new AtomicBoolean(false);
 	private static final Object FLOOR_BODY = new Object();
-
+	private Body floor;
+	private Body right;
+	private Body left;
 	/**
 	 * Creates game objects and adds them to the world.
 	 */
 	protected void initializeWorld(float height, float width) {
 		// the floor
-		Body floor = new Body();
+		floor = new Body();
 		floor.addFixture(Geometry.createRectangle(width, 0.2));
 		floor.setMass(MassType.INFINITE);
 		floor.translate(0, 0);
@@ -85,13 +87,13 @@ public class SimplePlatformerLevel {
 		this.world.addBody(floor);
 
 		// some bounding shapes
-		Body right = new Body();
+		right = new Body();
 		right.addFixture(Geometry.createRectangle(0.2,  height));
 		right.setMass(MassType.INFINITE);
 		right.translate(10, 7);
 		this.world.addBody(right);
 		
-		Body left = new Body();
+		left = new Body();
 		left.addFixture(Geometry.createRectangle(0.2, height));
 		left.setMass(MassType.INFINITE);
 		left.translate(-10, 7);
@@ -174,4 +176,15 @@ public class SimplePlatformerLevel {
 		return wheel;
 	}
 
+	public Body getFloor() {
+		return floor;
+	}
+
+	public Body getRight() {
+		return right;
+	}
+
+	public Body getLeft() {
+		return left;
+	}
 }

@@ -5,15 +5,20 @@ import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import portal.dto.FigureDTO;
+import portal.dto.RectangleDTO;
 import portal.stupid.LevelParameters;
 import portal.dto.CircleDTO;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Calendar;
 
 @Controller
@@ -22,24 +27,17 @@ public class SimplePlatformerController {
     LevelParameters levelparameters;
     SimplePlatformerLevel simplePlatformerLevel;
     long lastActionTimeMillisecond = Calendar.getInstance().getTimeInMillis();
-    /**
-     * The conversion factor from nano to base
-     */
     public static final double NANO_TO_BASE = 1.0e9;
-    /**
-     * True if the simulation is paused
-     */
     private boolean paused;
-
-    /**
-     * The time stamp for the last iteration
-     */
     private long last;
 
+    private Integer LEVEL_HEIGHT=400;
+    private Integer LEVEL_WIDTH=600;
+
     public SimplePlatformerController() {
-        levelparameters = new LevelParameters(500, 500, 0.01f);
+        levelparameters = new LevelParameters(LEVEL_HEIGHT, LEVEL_WIDTH,0);
         simplePlatformerLevel = new SimplePlatformerLevel();
-        simplePlatformerLevel.initializeWorld(500L, 500L);
+        simplePlatformerLevel.initializeWorld(LEVEL_HEIGHT, LEVEL_WIDTH);
         start();
     }
 
@@ -52,16 +50,47 @@ public class SimplePlatformerController {
 
     @GetMapping("/api/rolling/object/state/")
     public @ResponseBody
-    CircleDTO getObjectState() {
+    List<FigureDTO> getObjectState() {
         Circle circle = (Circle) simplePlatformerLevel.getWheel().getFixture(0).getShape();
         Transform transform = simplePlatformerLevel.getWheel().getTransform();
         Vector2 wc = transform.getTransformed(circle.getCenter());
-        Vector2 newPos = new Vector2(wc.x * 25 + 250, 500 - wc.y * (circle.getRadius() * 25));
+        Vector2 newPos = new Vector2(wc.x * 25 + LEVEL_WIDTH / 2, LEVEL_HEIGHT - wc.y * (circle.getRadius() * 25));
         CircleDTO dto = new CircleDTO();
         dto.setRadius(circle.getRadius() * 25);
         dto.setX(newPos.x);
         dto.setY(newPos.y);
-        return dto;
+        List<FigureDTO> figureDTOList=new ArrayList<>();
+        RectangleDTO left=new RectangleDTO();
+        RectangleDTO right=new RectangleDTO();
+        RectangleDTO floor=new RectangleDTO();
+        org.dyn4j.geometry.Rectangle leftRec= ( org.dyn4j.geometry.Rectangle) simplePlatformerLevel.getLeft().getFixture(0).getShape();
+        org.dyn4j.geometry.Rectangle rightRec= ( org.dyn4j.geometry.Rectangle) simplePlatformerLevel.getLeft().getFixture(0).getShape();
+        org.dyn4j.geometry.Rectangle floorRec= ( org.dyn4j.geometry.Rectangle) simplePlatformerLevel.getLeft().getFixture(0).getShape();
+
+        left.setHeight(leftRec.getHeight());
+        left.setWidth(leftRec.getWidth());
+         wc = transform.getTransformed(leftRec.getCenter());
+        left.setX(wc.x);
+        left.setY(wc.y);
+
+        right.setHeight(rightRec.getHeight());
+        right.setWidth(rightRec.getWidth());
+         wc = transform.getTransformed(rightRec.getCenter());
+        right.setX(wc.x);
+        right.setY(wc.y);
+
+        floor.setHeight(floorRec.getHeight());
+        floor.setWidth(floorRec.getWidth());
+        wc = transform.getTransformed(floorRec.getCenter());
+        floor.setX(wc.x);
+        floor.setY(wc.y);
+
+
+        figureDTOList.add(dto);
+        figureDTOList.add(left);
+        figureDTOList.add(right);
+        figureDTOList.add(floor);
+        return figureDTOList;
     }
 
     @ResponseBody
@@ -77,11 +106,8 @@ public class SimplePlatformerController {
     }
 
     private void gameLoop() {
-        // get the current time
         long time = System.nanoTime();
-        // get the elapsed time from the last iteration
         long diff = time - this.last;
-        // set the last time
         long currentTime = Calendar.getInstance().getTimeInMillis();
         if (currentTime - lastActionTimeMillisecond > 20) {
             simplePlatformerLevel.leftPressed.set(false);
@@ -89,45 +115,26 @@ public class SimplePlatformerController {
         }
 
         this.last = time;
-        // convert from nanoseconds to seconds
-
         double elapsedTime = (double) diff / NANO_TO_BASE;
 
         if (!paused) {
-            // update the World
             simplePlatformerLevel.update(elapsedTime);
         }
-        // Sync the display on some systems.
-        // (on Linux, this fixes event queue problems)
         Toolkit.getDefaultToolkit().sync();
     }
 
     private void start() {
-        // initialize the last update time
         this.last = System.nanoTime();
-        // don't allow AWT to paint the canvas since we are
-        // run a separate thread to do active rendering
-        // because we don't want to do it on the EDT
-        Thread thread = new Thread() {
-            public void run() {
-                // perform an infinite loop stopped
-                // render as fast as possible
-                while (true) {
-                    gameLoop();
-                    // you could add a Thread.yield(); or
-                    // Thread.sleep(long) here to give the
-                    // CPU some breathing room
-                    try {
-                        Thread.sleep(5);
-                    } catch (InterruptedException e) {
-                    }
+        Thread thread = new Thread(() -> {
+            while (true) {
+                gameLoop();
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
                 }
             }
-        };
-        // set the game loop thread to a daemon thread so that
-        // it cannot stop the JVM from exiting
+        });
         thread.setDaemon(true);
-        // start the game loop
         thread.start();
     }
 
