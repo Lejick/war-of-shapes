@@ -47,6 +47,10 @@ ctx = myGameArea.context;
             circle.arc(obj[i].x, obj[i].y, obj[i].radius, 0, 2 * Math.PI);;
          ctx.fillStyle = obj[i].color;
          ctx.fill(circle);
+        } else if (obj[i].type == "text") {
+            ctx.font = obj[i].width + " " + obj[i].height;
+            ctx.fillStyle = obj[i].color;
+            ctx.fillText(obj[i].text, obj[i].x, obj[i].y);
         }
         }
 }

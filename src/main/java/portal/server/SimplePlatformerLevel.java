@@ -80,7 +80,7 @@ public class SimplePlatformerLevel {
 	protected void initializeWorld(float height, float width) {
 		// the floor
 		floor = new Body();
-		floor.addFixture(Geometry.createRectangle(width, 0.2));
+		floor.addFixture(Geometry.createRectangle(width, width/100));
 		floor.setMass(MassType.INFINITE);
 		floor.translate(0, 0);
 		floor.setUserData(FLOOR_BODY);
@@ -88,24 +88,24 @@ public class SimplePlatformerLevel {
 
 		// some bounding shapes
 		right = new Body();
-		right.addFixture(Geometry.createRectangle(0.2,  height));
+		right.addFixture(Geometry.createRectangle(height/100,  height));
 		right.setMass(MassType.INFINITE);
-		right.translate(10, 7);
+		right.translate(width / 2, 7);
 		this.world.addBody(right);
-		
+
 		left = new Body();
-		left.addFixture(Geometry.createRectangle(0.2, height));
+		left.addFixture(Geometry.createRectangle(height / 100, height));
 		left.setMass(MassType.INFINITE);
-		left.translate(-10, 7);
+		left.translate(-width / 2, 7);
 		this.world.addBody(left);
-		
+
 		// the wheel
 		wheel = new Body();
 		// NOTE: lots of friction to simulate a sticky tire
-		wheel.addFixture(Geometry.createCircle(0.5), 1.0, 20.0, 0.1);
+		wheel.addFixture(Geometry.createCircle(width / 40), 1.0, 20.0, 0.1);
 		wheel.setMass(MassType.NORMAL);
 		this.world.addBody(wheel);
-		
+
 		this.world.addListener(new StepAdapter() {
 			@Override
 			public void begin(Step step, World world) {
