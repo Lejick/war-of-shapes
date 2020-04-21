@@ -32,13 +32,14 @@ public class SimplePlatformerController {
     private boolean paused;
     private long last;
 
-    private Integer LEVEL_HEIGHT=400;
-    private Integer LEVEL_WIDTH=400;
+    private Integer LEVEL_HEIGHT = 400;
+    private Integer LEVEL_WIDTH = 400;
+    private int scale = 20;
 
     public SimplePlatformerController() {
-        levelparameters = new LevelParameters(LEVEL_HEIGHT, LEVEL_WIDTH,0);
+        levelparameters = new LevelParameters(LEVEL_HEIGHT, LEVEL_WIDTH, 0);
         simplePlatformerLevel = new SimplePlatformerLevel();
-        simplePlatformerLevel.initializeWorld(20, 20);
+        simplePlatformerLevel.initializeWorld(LEVEL_HEIGHT / scale, LEVEL_WIDTH / scale);
         start();
     }
 
@@ -52,66 +53,23 @@ public class SimplePlatformerController {
     @GetMapping("/api/rolling/object/state/")
     public @ResponseBody
     List<FigureDTO> getObjectState() {
-        Circle circle = (Circle) simplePlatformerLevel.getWheel().getFixture(0).getShape();
-        Transform transform = simplePlatformerLevel.getWheel().getTransform();
-        Vector2 wc = transform.getTransformed(circle.getCenter());
-        Vector2 newPos = new Vector2(wc.x * 20 + LEVEL_WIDTH / 2, LEVEL_HEIGHT - wc.y * (circle.getRadius() * 20)-4);
-        CircleDTO dto = new CircleDTO();
-        dto.setRadius(circle.getRadius() * 20);
-        dto.setX(newPos.x);
-        dto.setY(newPos.y);
-
-        TextDTO texInnertDTO = new TextDTO();
-        texInnertDTO.setHeight(10);
-        texInnertDTO.setWidth(120);
-        texInnertDTO.setX(LEVEL_WIDTH - 220);
-        texInnertDTO.setY(35);
-        texInnertDTO.setText("Inner wheel  x:" + wc.x + "  y:" + wc.y);
 
         List<FigureDTO> figureDTOList = new ArrayList<>();
-        RectangleDTO left = new RectangleDTO();
-        RectangleDTO right = new RectangleDTO();
-        RectangleDTO floor = new RectangleDTO();
-        org.dyn4j.geometry.Rectangle leftRec = (org.dyn4j.geometry.Rectangle) simplePlatformerLevel.getLeft().getFixture(0).getShape();
-        org.dyn4j.geometry.Rectangle rightRec= ( org.dyn4j.geometry.Rectangle) simplePlatformerLevel.getRight().getFixture(0).getShape();
-        org.dyn4j.geometry.Rectangle floorRec= ( org.dyn4j.geometry.Rectangle) simplePlatformerLevel.getFloor().getFixture(0).getShape();
+        RectangleDTO leftDTO = new RectangleDTO(simplePlatformerLevel.getLeft(), scale, LEVEL_WIDTH, LEVEL_HEIGHT);
+        RectangleDTO rightDTO = new RectangleDTO(simplePlatformerLevel.getRight(), scale, LEVEL_WIDTH, LEVEL_HEIGHT);
+        RectangleDTO floorDTO = new RectangleDTO(simplePlatformerLevel.getFloor(), scale, LEVEL_WIDTH, LEVEL_HEIGHT);
+        CircleDTO circleDTO = new CircleDTO(simplePlatformerLevel.getWheel(),scale,LEVEL_WIDTH,LEVEL_HEIGHT);
 
-        left.setHeight(leftRec.getHeight());
-        left.setWidth(leftRec.getWidth());
-        wc = transform.getTransformed(leftRec.getCenter());
-        left.setX(wc.x);
-        left.setY(wc.y);
-
-        right.setHeight(rightRec.getHeight());
-        right.setWidth(rightRec.getWidth());
-         wc = transform.getTransformed(rightRec.getCenter());
-        right.setX(wc.x);
-        right.setY(wc.y);
-
-        floor.setHeight(floorRec.getHeight());
-        floor.setWidth(floorRec.getWidth());
-        wc = transform.getTransformed(floorRec.getCenter());
-        floor.setX(wc.x);
-        floor.setY(wc.y);
-
-        TextDTO textDTO=new TextDTO();
-        textDTO.setHeight(10);
-        textDTO.setWidth(120);
-        textDTO.setX(LEVEL_WIDTH-120);
-        textDTO.setY(15);
-        textDTO.setText("Circle  x:"+Math.round(dto.getX())+"  y:"+Math.round(dto.getY()));
-
-
-
-
-        figureDTOList.add(dto);
-        figureDTOList.add(left);
-        figureDTOList.add(right);
-        figureDTOList.add(floor);
-        figureDTOList.add(textDTO);
-        figureDTOList.add(texInnertDTO);
+        figureDTOList.add(circleDTO);
+        figureDTOList.add(leftDTO);
+        figureDTOList.add(rightDTO);
+        figureDTOList.add(floorDTO);
+        figureDTOList.add(getCircleTransformed(circleDTO));
+        figureDTOList.add(getCircleNatural());
         return figureDTOList;
     }
+
+
 
     @ResponseBody
     @RequestMapping(value = "/api/rolling/action/{action}")
@@ -158,5 +116,27 @@ public class SimplePlatformerController {
         thread.start();
     }
 
+    private TextDTO getCircleNatural(){
+        Transform transform = simplePlatformerLevel.getWheel().getTransform();
+        TextDTO texInnertDTO = new TextDTO();
+        Circle circle = (Circle) simplePlatformerLevel.getWheel().getFixture(0).getShape();
+        Vector2 wc = transform.getTransformed(circle.getCenter());
+        texInnertDTO.setHeight(10);
+        texInnertDTO.setWidth(120);
+        texInnertDTO.setX(LEVEL_WIDTH - 220);
+        texInnertDTO.setY(35);
+        texInnertDTO.setText("Inner wheel  x:" + wc.x + "  y:" + wc.y);
+        return texInnertDTO;
+    }
+
+    private TextDTO getCircleTransformed(CircleDTO dto){
+        TextDTO textDTO = new TextDTO();
+        textDTO.setHeight(10);
+        textDTO.setWidth(120);
+        textDTO.setX(LEVEL_WIDTH - 120);
+        textDTO.setY(15);
+        textDTO.setText("Circle  x:" + Math.round(dto.getX()*100)/100 + "  y:" + Math.round(dto.getY()*100)/100);
+        return  textDTO;
+    }
 
 }
