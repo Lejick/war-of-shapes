@@ -11,6 +11,7 @@
     </head>
     <script src="webjars/jquery/2.2.4/jquery.min.js"></script>
     <body onload="getParameters()">
+
     <script>
 
 var myGamePiece;
@@ -114,9 +115,29 @@ console.log("DONE");
 });
 }
 
+function resetLevel() {
+$.ajax({
+type : "GET",
+url : "/api/level/reset",
+timeout : 100000,
+success : function() {
+console.log("SUCCESS: ");
+},
+error : function(e) {
+console.log("ERROR: ", e);
+},
+done : function(e) {
+console.log("DONE");
+}
+});
+}
+
 </script>
 
     <br>
     <p>Try to control the green circle. 'A' = left, 'D' = right, 'Space' = jump</p>
     </body>
+
+    <input type='button' onclick='resetLevel()' value='Reset Level'>
+
 </html>

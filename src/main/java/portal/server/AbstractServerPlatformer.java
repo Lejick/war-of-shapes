@@ -33,9 +33,15 @@ public abstract class AbstractServerPlatformer {
     public AbstractServerPlatformer(ServerPlatformerLevelIF serverPlatformerLevel, int levelHeight, int levelWidth) {
         this.levelHeight = levelHeight;
         this.levelWidth = levelWidth;
-        levelparameters = new LevelParameters(levelHeight, levelWidth);
         this.simplePlatformerLevel = serverPlatformerLevel;
+        levelparameters = new LevelParameters(levelHeight, levelWidth);
         simplePlatformerLevel.initializeWorld(levelHeight / scale, levelWidth / scale);
+    }
+
+    public void resetWorld() {
+        paused = true;
+        simplePlatformerLevel.initializeWorld(levelHeight / scale, levelWidth / scale);
+        paused = false;
     }
 
     public AbstractServerPlatformer() {
@@ -54,13 +60,13 @@ public abstract class AbstractServerPlatformer {
         }
         CircleDTO circleDTO = new CircleDTO(simplePlatformerLevel.getActionBody(), scale, levelWidth, levelHeight);
         figureDTOList.add(circleDTO);
-        figureDTOList.add(getCircleTransformed(circleDTO));
-        figureDTOList.add(getCircleNatural());
+        // figureDTOList.add(getCircleTransformed(circleDTO));
+        // figureDTOList.add(getCircleNatural());
+        figureDTOList.add(getCircleForce());
         return figureDTOList;
     }
 
     protected void action(Integer action) {
-        LOGGER.info("action: " + action);
         lastActionTimeMillisecond = Calendar.getInstance().getTimeInMillis();
         if (action == 65) {
             simplePlatformerLevel.getLeftPressed().set(true);
@@ -128,6 +134,20 @@ public abstract class AbstractServerPlatformer {
         textDTO.setY(15);
         textDTO.setText("Transformed  x:" + df.format(dto.getX()) + "  y:" + df.format(dto.getY()));
         return textDTO;
+    }
+
+    private TextDTO getCircleForce() {
+        DecimalFormat df = new DecimalFormat("0.00");
+        Body actionBody = simplePlatformerLevel.getActionBody();
+        TextDTO texInnertDTO = new TextDTO();
+
+        texInnertDTO.setHeight(10);
+        texInnertDTO.setWidth(120);
+        texInnertDTO.setX(levelWidth - 150);
+        texInnertDTO.setY(35);
+       texInnertDTO.setText("Velocity x:" + df.format(actionBody.getLinearVelocity().x) + "  y:" +
+                df.format(actionBody.getLinearVelocity().y));
+        return texInnertDTO;
     }
 
 }

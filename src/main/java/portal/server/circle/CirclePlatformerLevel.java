@@ -29,6 +29,7 @@ import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 import org.dyn4j.geometry.Vector2;
+import portal.dto.FigureDTO;
 import portal.server.ServerPlatformerLevelIF;
 
 import java.util.ArrayList;
@@ -141,6 +142,7 @@ public class CirclePlatformerLevel implements ServerPlatformerLevelIF {
         return obstaclesList;
     }
 
+
     public void update(double elapsedTime) {
         // apply a torque based on key input
         if (this.leftPressed.get()) {
@@ -150,7 +152,7 @@ public class CirclePlatformerLevel implements ServerPlatformerLevelIF {
             wheel.applyTorque(-Math.PI / 2);
         }
         if (this.jumpPressed.get()) {
-            Vector2 jumpVector = wheel.getForce();
+            Vector2 jumpVector = new Vector2();
             jumpVector.y = 1;
             wheel.applyImpulse(jumpVector);
         }

@@ -26,14 +26,16 @@ package portal.server.moving;
 
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.World;
-import org.dyn4j.geometry.Geometry;
-import org.dyn4j.geometry.MassType;
-import org.dyn4j.geometry.Vector2;
+import org.dyn4j.geometry.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import portal.dto.CircleDTO;
+import portal.dto.FigureDTO;
+import portal.dto.TextDTO;
 import portal.server.AbstractServerPlatformer;
 import portal.server.ServerPlatformerLevelIF;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -54,7 +56,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 3.2.5
  */
 public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
-    private final Logger LOGGER = LoggerFactory.getLogger(AbstractServerPlatformer.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(MovingPlatformerLevel.class);
     protected final World world = new World();
 
     /**
@@ -63,6 +65,7 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     public MovingPlatformerLevel() {
 
     }
+
     private Body wheel;
     public final AtomicBoolean leftPressed = new AtomicBoolean(false);
     public final AtomicBoolean rightPressed = new AtomicBoolean(false);
@@ -77,6 +80,8 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     public void initializeWorld(float height, float width) {
         this.height = height;
         this.width = width;
+        world.removeAllBodies();
+        obstaclesList.clear();
         initObstacles();
         initPlayBody();
         this.world.addBody(wheel);
@@ -90,7 +95,9 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
         wheel = new Body();
         wheel.addFixture(Geometry.createCircle(width / 40), 1.0, 10.0, 0.5);
         wheel.setMass(MassType.NORMAL);
+        wheel.translate(height / 3, width / 10);
     }
+
     @Override
     public void initObstacles() {
         Body floor = new Body();
@@ -134,23 +141,22 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     public Body getActionBody() {
         return wheel;
     }
-@Override
+
+    @Override
     public void update(double elapsedTime) {
-        // apply a torque based on key input
         if (this.leftPressed.get()) {
             wheel.applyTorque(Math.PI / 2);
         }
         if (this.rightPressed.get()) {
             wheel.applyTorque(-Math.PI / 2);
         }
-    if (this.jumpPressed.get() && getActionBody().getInContactBodies(false).size()>0) {
-        Vector2 jumpVector = wheel.getForce();
-        jumpVector.y = 1;
-        wheel.applyImpulse(jumpVector);
-        LOGGER.info("contact body:"+ getActionBody().getInContactBodies(false).size());
+        if (this.jumpPressed.get() && getActionBody().getInContactBodies(false).size() > 0) {
+            Vector2 jumpVector = wheel.getLinearVelocity();
+            jumpVector.y = jumpVector.y + 3;
+            wheel.setLinearVelocity(jumpVector);
+        }
+        this.world.update(elapsedTime);
     }
-    this.world.update(elapsedTime);
-}
 
     @Override
     public List<Body> getObstaclesList() {
@@ -160,10 +166,12 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     public AtomicBoolean getLeftPressed() {
         return leftPressed;
     }
+
     @Override
     public AtomicBoolean getRightPressed() {
         return rightPressed;
     }
+
     @Override
     public AtomicBoolean getJumpPressed() {
         return jumpPressed;

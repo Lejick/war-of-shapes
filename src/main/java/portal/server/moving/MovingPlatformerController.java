@@ -1,11 +1,9 @@
 package portal.server.moving;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import portal.dto.FigureDTO;
+import portal.dto.RectangleDTO;
 import portal.server.AbstractServerPlatformer;
 import portal.server.LevelParameters;
 
@@ -32,6 +30,13 @@ public class MovingPlatformerController extends AbstractServerPlatformer {
     public @ResponseBody
     List<FigureDTO> getObjectStateImpl() {
         return getObjectState();
+    }
+
+    @GetMapping("/api/level/reset")
+    public @ResponseBody
+    FigureDTO resetLevelImpl() {
+        resetWorld();
+        return new RectangleDTO();
     }
 
 
