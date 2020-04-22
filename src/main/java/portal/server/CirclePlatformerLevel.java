@@ -37,6 +37,7 @@ import org.dyn4j.geometry.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -111,6 +112,20 @@ public class CirclePlatformerLevel {
         roof.addFixture(Geometry.createRectangle(width, width / 100));
         roof.setMass(MassType.INFINITE);
         roof.translate(0, height);
+
+        Random random = new Random();
+        int minObsLen = Math.round(width / 20);
+        int maxObsLen = Math.round(width / 3);
+        for (int i = 0; i < 10; i++) {
+            Body obs = new Body();
+            int nextLen = minObsLen + random.nextInt(maxObsLen - minObsLen + 1);
+            obs.addFixture(Geometry.createRectangle(nextLen, width / 100));
+            obs.setMass(MassType.INFINITE);
+            int nextMiss = random.nextInt(Math.round(width) - nextLen);
+            obs.translate(nextMiss, random.nextInt(Math.round(height) + 1));
+            obstaclesList.add(obs);
+        }
+
 
         obstaclesList.add(left);
         obstaclesList.add(right);
