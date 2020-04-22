@@ -6,11 +6,6 @@ import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import portal.dto.FigureDTO;
 import portal.dto.RectangleDTO;
 import portal.dto.TextDTO;
@@ -23,61 +18,56 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Calendar;
 
-@Controller
-public class CirclePlatformerController {
-    private final Logger LOGGER = LoggerFactory.getLogger(CirclePlatformerController.class);
-    LevelParametersServer levelparameters;
-    CirclePlatformerLevel simplePlatformerLevel;
+public abstract class AbstractServerPlatformer {
+    private final Logger LOGGER = LoggerFactory.getLogger(AbstractServerPlatformer.class);
+    private LevelParameters levelparameters;
+    private ServerPlatformerLevelIF simplePlatformerLevel;
     long lastActionTimeMillisecond = Calendar.getInstance().getTimeInMillis();
     public static final double NANO_TO_BASE = 1.0e9;
     private boolean paused;
     private long last;
+    private int levelHeight, levelWidth;
 
-    private Integer LEVEL_HEIGHT = 400;
-    private Integer LEVEL_WIDTH = 400;
     private int scale = 20;
 
-    public CirclePlatformerController() {
-        levelparameters = new LevelParametersServer(LEVEL_HEIGHT, LEVEL_WIDTH);
-        simplePlatformerLevel = new CirclePlatformerLevel();
-        simplePlatformerLevel.initializeWorld(LEVEL_HEIGHT / scale, LEVEL_WIDTH / scale);
-        start();
+    public AbstractServerPlatformer(ServerPlatformerLevelIF serverPlatformerLevel, int levelHeight, int levelWidth) {
+        this.levelHeight = levelHeight;
+        this.levelWidth = levelWidth;
+        levelparameters = new LevelParameters(levelHeight, levelWidth);
+        this.simplePlatformerLevel = serverPlatformerLevel;
+        simplePlatformerLevel.initializeWorld(levelHeight / scale, levelWidth / scale);
     }
 
-    @GetMapping("/api/level/rolling/ball/description")
-    public @ResponseBody
-    LevelParametersServer getLevelDescription() {
+    public AbstractServerPlatformer() {
+    }
+
+    protected LevelParameters getLevelDescription() {
         return levelparameters;
     }
 
 
-    @GetMapping("/api/rolling/object/state/")
-    public @ResponseBody
-    List<FigureDTO> getObjectState() {
+    protected List<FigureDTO> getObjectState() {
         List<FigureDTO> figureDTOList = new ArrayList<>();
         for (Body body : simplePlatformerLevel.getObstaclesList()) {
-            RectangleDTO obstacleDTO = new RectangleDTO(body, scale, LEVEL_WIDTH, LEVEL_HEIGHT);
+            RectangleDTO obstacleDTO = new RectangleDTO(body, scale, levelWidth, levelHeight);
             figureDTOList.add(obstacleDTO);
         }
-        CircleDTO circleDTO = new CircleDTO(simplePlatformerLevel.getWheel(), scale, LEVEL_WIDTH, LEVEL_HEIGHT);
+        CircleDTO circleDTO = new CircleDTO(simplePlatformerLevel.getActionBody(), scale, levelWidth, levelHeight);
         figureDTOList.add(circleDTO);
         figureDTOList.add(getCircleTransformed(circleDTO));
         figureDTOList.add(getCircleNatural());
         return figureDTOList;
     }
 
-
-    @ResponseBody
-    @RequestMapping(value = "/api/rolling/action/{action}")
-    public void action(@PathVariable(value = "action") Integer action) {
+    protected void action(Integer action) {
         LOGGER.info("action: " + action);
         lastActionTimeMillisecond = Calendar.getInstance().getTimeInMillis();
         if (action == 65) {
-            simplePlatformerLevel.leftPressed.set(true);
+            simplePlatformerLevel.getLeftPressed().set(true);
         } else if (action == 68) {
-            simplePlatformerLevel.rightPressed.set(true);
+            simplePlatformerLevel.getRightPressed().set(true);
         } else if (action == 32) {
-            simplePlatformerLevel.jumpPressed.set(true);
+            simplePlatformerLevel.getJumpPressed().set(true);
         }
     }
 
@@ -86,9 +76,9 @@ public class CirclePlatformerController {
         long diff = time - this.last;
         long currentTime = Calendar.getInstance().getTimeInMillis();
         if (currentTime - lastActionTimeMillisecond > 20) {
-            simplePlatformerLevel.leftPressed.set(false);
-            simplePlatformerLevel.rightPressed.set(false);
-            simplePlatformerLevel.jumpPressed.set(false);
+            simplePlatformerLevel.getLeftPressed().set(false);
+            simplePlatformerLevel.getRightPressed().set(false);
+            simplePlatformerLevel.getJumpPressed().set(false);
         }
 
         this.last = time;
@@ -100,7 +90,7 @@ public class CirclePlatformerController {
         Toolkit.getDefaultToolkit().sync();
     }
 
-    private void start() {
+    protected void start() {
         this.last = System.nanoTime();
         Thread thread = new Thread(() -> {
             while (true) {
@@ -117,13 +107,13 @@ public class CirclePlatformerController {
 
     private TextDTO getCircleNatural() {
         DecimalFormat df = new DecimalFormat("0.00");
-        Transform transform = simplePlatformerLevel.getWheel().getTransform();
+        Transform transform = simplePlatformerLevel.getActionBody().getTransform();
         TextDTO texInnertDTO = new TextDTO();
-        Circle circle = (Circle) simplePlatformerLevel.getWheel().getFixture(0).getShape();
+        Circle circle = (Circle) simplePlatformerLevel.getActionBody().getFixture(0).getShape();
         Vector2 wc = transform.getTransformed(circle.getCenter());
         texInnertDTO.setHeight(10);
         texInnertDTO.setWidth(120);
-        texInnertDTO.setX(LEVEL_WIDTH - 150);
+        texInnertDTO.setX(levelWidth - 150);
         texInnertDTO.setY(35);
         texInnertDTO.setText("Natural  x:" + df.format(wc.x) + "  y:" + df.format(wc.y));
         return texInnertDTO;
@@ -134,7 +124,7 @@ public class CirclePlatformerController {
         TextDTO textDTO = new TextDTO();
         textDTO.setHeight(10);
         textDTO.setWidth(120);
-        textDTO.setX(LEVEL_WIDTH - 150);
+        textDTO.setX(levelWidth - 150);
         textDTO.setY(15);
         textDTO.setText("Transformed  x:" + df.format(dto.getX()) + "  y:" + df.format(dto.getY()));
         return textDTO;

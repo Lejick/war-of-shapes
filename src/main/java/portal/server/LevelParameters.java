@@ -3,11 +3,11 @@ package portal.server;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize
-public class LevelParametersServer {
+public class LevelParameters {
     int maxHeight;
     int maxWidth;
 
-    public LevelParametersServer(int maxHeight, int maxWidth) {
+    public LevelParameters(int maxHeight, int maxWidth) {
         this.maxHeight = maxHeight;
         this.maxWidth = maxWidth;
     }

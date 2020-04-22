@@ -56,11 +56,11 @@ ctx = myGameArea.context;
 }
 </script>
 
-<script>
+    <script>
 function getParameters() {
 $.ajax({
 type : "GET",
-url : "/api/level/description/rolling/",
+url : "/api/level/description/movingp/",
 timeout : 100000,
 contentType: "application/json",
 dataType: "json",
@@ -80,7 +80,7 @@ console.log("DONE");
 function getObjectState() {
 $.ajax({
 type : "GET",
-url : "/api/object/state/rolling/",
+url : "/api/object/state/movingp/",
 timeout : 100000,
 contentType: "application/json",
 dataType: "json",
@@ -100,7 +100,7 @@ console.log("DONE");
 function sendAction(action) {
 $.ajax({
 type : "GET",
-url : "/api/action/rolling/"+action,
+url : "/api/action/movingp/"+action,
 timeout : 100000,
 success : function(action) {
 console.log("SUCCESS: ", action);

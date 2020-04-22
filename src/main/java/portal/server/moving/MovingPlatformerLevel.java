@@ -22,18 +22,17 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package portal.server;
+package portal.server.moving;
 
 import org.dyn4j.dynamics.Body;
-import org.dyn4j.dynamics.Step;
-import org.dyn4j.dynamics.StepAdapter;
 import org.dyn4j.dynamics.World;
-import org.dyn4j.dynamics.contact.ContactAdapter;
-import org.dyn4j.dynamics.contact.ContactPoint;
-import org.dyn4j.dynamics.contact.PersistedContactPoint;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 import org.dyn4j.geometry.Vector2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import portal.server.AbstractServerPlatformer;
+import portal.server.ServerPlatformerLevelIF;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,14 +53,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @version 3.2.0
  * @since 3.2.5
  */
-public class CirclePlatformerLevel {
-
+public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
+    private final Logger LOGGER = LoggerFactory.getLogger(AbstractServerPlatformer.class);
     protected final World world = new World();
 
     /**
      * Default constructor for the window
      */
-    public CirclePlatformerLevel() {
+    public MovingPlatformerLevel() {
 
     }
     private Body wheel;
@@ -74,8 +73,8 @@ public class CirclePlatformerLevel {
     /**
      * Creates game objects and adds them to the world.
      */
-    protected void initializeWorld(float height, float width) {
-        // the floor
+    @Override
+    public void initializeWorld(float height, float width) {
         this.height = height;
         this.width = width;
         initObstacles();
@@ -86,13 +85,14 @@ public class CirclePlatformerLevel {
         }
     }
 
-    private void initPlayBody() {
+    @Override
+    public void initPlayBody() {
         wheel = new Body();
         wheel.addFixture(Geometry.createCircle(width / 40), 1.0, 10.0, 0.5);
         wheel.setMass(MassType.NORMAL);
     }
-
-    private void initObstacles() {
+    @Override
+    public void initObstacles() {
         Body floor = new Body();
         floor.addFixture(Geometry.createRectangle(width, width / 100));
         floor.setMass(MassType.INFINITE);
@@ -121,19 +121,21 @@ public class CirclePlatformerLevel {
             int nextLen = minObsLen + random.nextInt(maxObsLen - minObsLen + 1);
             obs.addFixture(Geometry.createRectangle(nextLen, width / 100));
             obs.setMass(MassType.INFINITE);
-            int nextMiss = random.nextInt(Math.round(width) - nextLen);
+            int nextMiss = random.nextInt(Math.round(width) / 2 - nextLen / 2) - Math.round(width) / 2 + nextLen / 2;
             obs.translate(nextMiss, random.nextInt(Math.round(height) + 1));
             obstaclesList.add(obs);
         }
-
-
         obstaclesList.add(left);
         obstaclesList.add(right);
         obstaclesList.add(floor);
         obstaclesList.add(roof);
     }
 
-    protected void update(double elapsedTime) {
+    public Body getActionBody() {
+        return wheel;
+    }
+@Override
+    public void update(double elapsedTime) {
         // apply a torque based on key input
         if (this.leftPressed.get()) {
             wheel.applyTorque(Math.PI / 2);
@@ -141,24 +143,29 @@ public class CirclePlatformerLevel {
         if (this.rightPressed.get()) {
             wheel.applyTorque(-Math.PI / 2);
         }
-        if (this.jumpPressed.get()) {
-            Vector2 jumpVector = wheel.getForce();
-            jumpVector.y = 1;
-            wheel.applyImpulse(jumpVector);
-        }
-        updateWorld(elapsedTime);
+    if (this.jumpPressed.get() && getActionBody().getInContactBodies(false).size()>0) {
+        Vector2 jumpVector = wheel.getForce();
+        jumpVector.y = 1;
+        wheel.applyImpulse(jumpVector);
+        LOGGER.info("contact body:"+ getActionBody().getInContactBodies(false).size());
     }
+    this.world.update(elapsedTime);
+}
 
-    protected void updateWorld(double elapsedTime) {
-        this.world.update(elapsedTime);
-    }
-
-    public Body getWheel() {
-        return wheel;
-    }
-
+    @Override
     public List<Body> getObstaclesList() {
         return obstaclesList;
     }
-
+    @Override
+    public AtomicBoolean getLeftPressed() {
+        return leftPressed;
+    }
+    @Override
+    public AtomicBoolean getRightPressed() {
+        return rightPressed;
+    }
+    @Override
+    public AtomicBoolean getJumpPressed() {
+        return jumpPressed;
+    }
 }

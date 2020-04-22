@@ -19,6 +19,8 @@ public class MenuController {
 
     public static final String SERVER_BASED_FORM = "serverbased";
 
+    public static final String MOVING_PLATFORM_FORM = "movingplatform";
+
     @GetMapping("/floating")
     public String upload() {
         return FLOAT_FORM;
@@ -32,6 +34,11 @@ public class MenuController {
     @GetMapping("/serverbased")
     public String serverbased() {
         return SERVER_BASED_FORM;
+    }
+
+    @GetMapping("/movingplatform")
+    public String movingPlatform() {
+        return MOVING_PLATFORM_FORM;
     }
 
     @GetMapping("/rollingBall")
