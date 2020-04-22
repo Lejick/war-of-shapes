@@ -35,6 +35,7 @@ import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 import org.dyn4j.geometry.Vector2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -62,98 +63,59 @@ public class CirclePlatformerLevel {
     public CirclePlatformerLevel() {
 
     }
-
     private Body wheel;
-
     public final AtomicBoolean leftPressed = new AtomicBoolean(false);
     public final AtomicBoolean rightPressed = new AtomicBoolean(false);
     public final AtomicBoolean jumpPressed = new AtomicBoolean(false);
-    private final AtomicBoolean isOnGround = new AtomicBoolean(false);
-    private static final Object FLOOR_BODY = new Object();
-    private Body floor;
-    private Body right;
-    private Body left;
+    private List<Body> obstaclesList = new ArrayList<>();
+    private float height, width;
 
     /**
      * Creates game objects and adds them to the world.
      */
     protected void initializeWorld(float height, float width) {
         // the floor
-        floor = new Body();
+        this.height = height;
+        this.width = width;
+        initObstacles();
+        initPlayBody();
+        this.world.addBody(wheel);
+        for (Body body : obstaclesList) {
+            this.world.addBody(body);
+        }
+    }
+
+    private void initPlayBody() {
+        wheel = new Body();
+        wheel.addFixture(Geometry.createCircle(width / 40), 1.0, 10.0, 0.5);
+        wheel.setMass(MassType.NORMAL);
+    }
+
+    private void initObstacles() {
+        Body floor = new Body();
         floor.addFixture(Geometry.createRectangle(width, width / 100));
         floor.setMass(MassType.INFINITE);
         floor.translate(0, 0);
-        floor.setUserData(FLOOR_BODY);
-        this.world.addBody(floor);
 
-        // some bounding shapes
-        right = new Body();
-        right.addFixture(Geometry.createRectangle(height / 100, height));
-        right.setMass(MassType.INFINITE);
-        right.translate(width / 2, 7);
-        this.world.addBody(right);
-
-        left = new Body();
+        Body left = new Body();
         left.addFixture(Geometry.createRectangle(height / 100, height));
         left.setMass(MassType.INFINITE);
-        left.translate(-width / 2, 7);
-        this.world.addBody(left);
+        left.translate(-width / 2, height / 2);
 
-        // the wheel
-        wheel = new Body();
-        // NOTE: lots of friction to simulate a sticky tire
-        wheel.addFixture(Geometry.createCircle(width / 40), 1.0, 10.0, 0.5);
-        wheel.setMass(MassType.NORMAL);
-        this.world.addBody(wheel);
+        Body right = new Body();
+        right.addFixture(Geometry.createRectangle(height / 100, height));
+        right.setMass(MassType.INFINITE);
+        right.translate(width / 2, height / 2);
 
-        this.world.addListener(new StepAdapter() {
-            @Override
-            public void begin(Step step, World world) {
-                // at the beginning of each world step, check if the body is in
-                // contact with any of the floor bodies
-                boolean isGround = false;
-                List<Body> bodies = wheel.getInContactBodies(false);
-                for (int i = 0; i < bodies.size(); i++) {
-                    if (bodies.get(i).getUserData() == FLOOR_BODY) {
-                        isGround = true;
-                        break;
-                    }
-                }
+        Body roof = new Body();
+        roof.addFixture(Geometry.createRectangle(width, width / 100));
+        roof.setMass(MassType.INFINITE);
+        roof.translate(0, height);
 
-                if (!isGround) {
-                    // if not, then set the flag, and update the color
-                    isOnGround.set(false);
-                }
-            }
-        });
-
-        // then, when a contact is created between two bodies, check if the bodies
-        // are floor and wheel, if so, then set the color and flag
-        this.world.addListener(new ContactAdapter() {
-            private boolean isContactWithFloor(ContactPoint point) {
-                if ((point.getBody1() == wheel || point.getBody2() == wheel) &&
-                        (point.getBody1().getUserData() == FLOOR_BODY || point.getBody2().getUserData() == FLOOR_BODY)) {
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public boolean persist(PersistedContactPoint point) {
-                if (isContactWithFloor(point)) {
-                    isOnGround.set(true);
-                }
-                return super.persist(point);
-            }
-
-            @Override
-            public boolean begin(ContactPoint point) {
-                if (isContactWithFloor(point)) {
-                    isOnGround.set(true);
-                }
-                return super.begin(point);
-            }
-        });
+        obstaclesList.add(left);
+        obstaclesList.add(right);
+        obstaclesList.add(floor);
+        obstaclesList.add(roof);
     }
 
     protected void update(double elapsedTime) {
@@ -169,12 +131,10 @@ public class CirclePlatformerLevel {
             jumpVector.y = 1;
             wheel.applyImpulse(jumpVector);
         }
-
         updateWorld(elapsedTime);
     }
 
     protected void updateWorld(double elapsedTime) {
-        // update the world with the elapsed time
         this.world.update(elapsedTime);
     }
 
@@ -182,15 +142,8 @@ public class CirclePlatformerLevel {
         return wheel;
     }
 
-    public Body getFloor() {
-        return floor;
+    public List<Body> getObstaclesList() {
+        return obstaclesList;
     }
 
-    public Body getRight() {
-        return right;
-    }
-
-    public Body getLeft() {
-        return left;
-    }
 }

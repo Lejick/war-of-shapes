@@ -1,5 +1,6 @@
 package portal.server;
 
+import org.dyn4j.dynamics.Body;
 import org.dyn4j.geometry.Circle;
 import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
@@ -53,17 +54,13 @@ public class CirclePlatformerController {
     @GetMapping("/api/rolling/object/state/")
     public @ResponseBody
     List<FigureDTO> getObjectState() {
-
         List<FigureDTO> figureDTOList = new ArrayList<>();
-        RectangleDTO leftDTO = new RectangleDTO(simplePlatformerLevel.getLeft(), scale, LEVEL_WIDTH, LEVEL_HEIGHT);
-        RectangleDTO rightDTO = new RectangleDTO(simplePlatformerLevel.getRight(), scale, LEVEL_WIDTH, LEVEL_HEIGHT);
-        RectangleDTO floorDTO = new RectangleDTO(simplePlatformerLevel.getFloor(), scale, LEVEL_WIDTH, LEVEL_HEIGHT);
+        for (Body body : simplePlatformerLevel.getObstaclesList()) {
+            RectangleDTO obstacleDTO = new RectangleDTO(body, scale, LEVEL_WIDTH, LEVEL_HEIGHT);
+            figureDTOList.add(obstacleDTO);
+        }
         CircleDTO circleDTO = new CircleDTO(simplePlatformerLevel.getWheel(), scale, LEVEL_WIDTH, LEVEL_HEIGHT);
-
         figureDTOList.add(circleDTO);
-        figureDTOList.add(leftDTO);
-        figureDTOList.add(rightDTO);
-        figureDTOList.add(floorDTO);
         figureDTOList.add(getCircleTransformed(circleDTO));
         figureDTOList.add(getCircleNatural());
         return figureDTOList;
