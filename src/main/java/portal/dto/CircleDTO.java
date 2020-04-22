@@ -19,7 +19,7 @@ public class CircleDTO implements FigureDTO{
         Circle circle = (Circle) simpleBody.getFixture(0).getShape();
         Transform transform = simpleBody.getTransform();
         Vector2 wc = transform.getTransformed(circle.getCenter());
-        Vector2 newPos = new Vector2(wc.x * scale + levelWidth / 2, levelHeight - wc.y * (circle.getRadius() * scale) - 6);
+        Vector2 newPos = new Vector2(wc.x * scale + levelWidth / 2, levelHeight - wc.y * scale);
         setRadius(circle.getRadius() * scale);
         setX(newPos.x);
         setY(newPos.y);

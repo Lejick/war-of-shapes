@@ -1,4 +1,4 @@
-package portal.stupid;
+package portal.simple;
 
 import org.dyn4j.geometry.Vector2;
 import portal.dto.RectangleDTO;

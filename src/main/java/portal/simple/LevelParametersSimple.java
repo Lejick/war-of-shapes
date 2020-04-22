@@ -1,15 +1,14 @@
-package portal.stupid;
+package portal.simple;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize
-public class LevelParameters {
+public class LevelParametersSimple {
     int maxHeight;
     int maxWidth;
     float frictionForce;
 
-
-    public LevelParameters(int maxHeight, int maxWidth, float frictionForce) {
+    public LevelParametersSimple(int maxHeight, int maxWidth, float frictionForce) {
         this.maxHeight = maxHeight;
         this.maxWidth = maxWidth;
         this.frictionForce = frictionForce;

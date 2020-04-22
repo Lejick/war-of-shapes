@@ -1,4 +1,4 @@
-package portal.stupid;
+package portal.simple;
 
 import org.dyn4j.geometry.Vector2;
 import org.slf4j.Logger;
@@ -13,22 +13,22 @@ import portal.dto.RectangleDTO;
 import java.util.Calendar;
 
 @Controller
-public class LevelContextNormal {
-    private final Logger LOGGER = LoggerFactory.getLogger(LevelContextNormal.class);
+public class LevelContextSimple {
+    private final Logger LOGGER = LoggerFactory.getLogger(LevelContextSimple.class);
     Rectangle rectangle;
-    LevelParameters levelparameters;
+    LevelParametersSimple levelparameters;
     long lastActionTimeMillisecond = Calendar.getInstance().getTimeInMillis();
 
-    public LevelContextNormal() {
+    public LevelContextSimple() {
         rectangle = new Rectangle(30, 30, new Vector2(50,50));
-        levelparameters = new LevelParameters(500, 500, 0.01f);
+        levelparameters = new LevelParametersSimple(500, 500, 0.01f);
         rectangle.setSpeedX(2);
         rectangle.setSpeedY(2);
     }
 
     @GetMapping("/api/level/normal/description")
     public @ResponseBody
-    LevelParameters getLevelDescription() {
+    LevelParametersSimple getLevelDescription() {
         return levelparameters;
     }
 

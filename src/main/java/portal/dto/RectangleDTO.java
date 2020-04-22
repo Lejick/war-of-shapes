@@ -8,19 +8,19 @@ import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
 
 @JsonSerialize
-public class RectangleDTO implements FigureDTO{
+public class RectangleDTO implements FigureDTO {
     double height;
     double width;
     double x;
     double y;
-    String type="rectangle";
+    String type = "rectangle";
     String color = "red";
 
     public RectangleDTO(Body simpleBody, int scale, int levelWidth, int levelHeight) {
         Rectangle rectangle = (Rectangle) simpleBody.getFixture(0).getShape();
         Transform transform = simpleBody.getTransform();
         Vector2 wc = transform.getTransformed(rectangle.getCenter());
-        Vector2 newPos = new Vector2(wc.x * scale+levelWidth/2-(rectangle.getWidth()*scale)/2, levelHeight - wc.y * scale-(rectangle.getHeight()*scale)/2);
+        Vector2 newPos = new Vector2(wc.x * scale + levelWidth / 2 - ((rectangle.getWidth() / 2) * scale), levelHeight - wc.y * scale - (rectangle.getHeight() * scale) / 2);
         setWidth(rectangle.getWidth() * scale);
         setHeight(rectangle.getHeight() * scale);
         setX(newPos.x);

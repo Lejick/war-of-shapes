@@ -1,21 +1,15 @@
-package portal.stupid;
+package portal.server;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @JsonSerialize
-public class Level {
+public class LevelParametersServer {
     int maxHeight;
     int maxWidth;
-    float frictionForce;
-    List<Figure> figuresList=new ArrayList<>();
 
-    public Level(int maxHeight, int maxWidth, float frictionForce) {
+    public LevelParametersServer(int maxHeight, int maxWidth) {
         this.maxHeight = maxHeight;
         this.maxWidth = maxWidth;
-        this.frictionForce = frictionForce;
     }
 
     public int getMaxHeight() {
@@ -33,13 +27,4 @@ public class Level {
     public void setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
     }
-
-    public float getFrictionForce() {
-        return frictionForce;
-    }
-
-    public void setFrictionForce(float frictionForce) {
-        this.frictionForce = frictionForce;
-    }
-
 }

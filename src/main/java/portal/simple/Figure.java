@@ -1,4 +1,4 @@
-package portal.stupid;
+package portal.simple;
 
 public interface Figure {
 }
