@@ -29,7 +29,7 @@ public class MovingPlatformerController extends AbstractServerPlatformer {
     @GetMapping("/api/object/state/movingp")
     public @ResponseBody
     List<FigureDTO> getObjectStateImpl() {
-        return getObjectState();
+        return getObjectState2();
     }
 
     @GetMapping("/api/level/reset")

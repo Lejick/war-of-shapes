@@ -11,6 +11,7 @@ import portal.dto.RectangleDTO;
 import portal.dto.TextDTO;
 
 import portal.dto.CircleDTO;
+import portal.simple.Rectangle;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -60,6 +61,20 @@ public abstract class AbstractServerPlatformer {
         }
         CircleDTO circleDTO = new CircleDTO(simplePlatformerLevel.getActionBody(), scale, levelWidth, levelHeight);
         figureDTOList.add(circleDTO);
+        // figureDTOList.add(getCircleTransformed(circleDTO));
+        // figureDTOList.add(getCircleNatural());
+        figureDTOList.add(getCircleForce());
+        return figureDTOList;
+    }
+
+    protected synchronized List<FigureDTO> getObjectState2() {
+        List<FigureDTO> figureDTOList = new ArrayList<>();
+        for (Body body : simplePlatformerLevel.getObstaclesList()) {
+            RectangleDTO obstacleDTO = new RectangleDTO(body, scale, levelWidth, levelHeight);
+            figureDTOList.add(obstacleDTO);
+        }
+        RectangleDTO rectangleDTO = new RectangleDTO(simplePlatformerLevel.getActionBody(), scale, levelWidth, levelHeight);
+        figureDTOList.add(rectangleDTO);
         // figureDTOList.add(getCircleTransformed(circleDTO));
         // figureDTOList.add(getCircleNatural());
         figureDTOList.add(getCircleForce());
