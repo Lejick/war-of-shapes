@@ -100,7 +100,7 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     @Override
     public void initPlayBody() {
         wheel = new Body();
-        wheel.addFixture(Geometry.createRectangle(width / 40,width/40), 1.0, 10.0, 0.5);
+        wheel.addFixture(Geometry.createCircle(width / 40), 1.0, 10.0, 0.5);
         wheel.setMass(MassType.NORMAL);
         wheel.translate(height / 3, width / 10);
     }
