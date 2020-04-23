@@ -52,7 +52,7 @@ public abstract class AbstractServerPlatformer {
     }
 
 
-    protected List<FigureDTO> getObjectState() {
+    protected synchronized List<FigureDTO> getObjectState() {
         List<FigureDTO> figureDTOList = new ArrayList<>();
         for (Body body : simplePlatformerLevel.getObstaclesList()) {
             RectangleDTO obstacleDTO = new RectangleDTO(body, scale, levelWidth, levelHeight);

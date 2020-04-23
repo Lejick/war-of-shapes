@@ -72,6 +72,12 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     public final AtomicBoolean jumpPressed = new AtomicBoolean(false);
     private List<Body> obstaclesList = new ArrayList<>();
     private float height, width;
+    private Body left;
+    private Body right;
+    private Body floor;
+    private Body roof;
+
+    float  recLen ;
 
     /**
      * Creates game objects and adds them to the world.
@@ -80,6 +86,7 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     public void initializeWorld(float height, float width) {
         this.height = height;
         this.width = width;
+        this.recLen = width / 10;
         world.removeAllBodies();
         obstaclesList.clear();
         initObstacles();
@@ -93,43 +100,47 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     @Override
     public void initPlayBody() {
         wheel = new Body();
-        wheel.addFixture(Geometry.createCircle(width / 40), 1.0, 10.0, 0.5);
+        wheel.addFixture(Geometry.createRectangle(width / 40,width/40), 1.0, 10.0, 0.5);
         wheel.setMass(MassType.NORMAL);
         wheel.translate(height / 3, width / 10);
     }
 
     @Override
     public void initObstacles() {
-        Body floor = new Body();
+        floor = new Body();
         floor.addFixture(Geometry.createRectangle(width, width / 100));
         floor.setMass(MassType.INFINITE);
         floor.translate(0, 0);
 
-        Body left = new Body();
+        left = new Body();
         left.addFixture(Geometry.createRectangle(height / 100, height));
         left.setMass(MassType.INFINITE);
         left.translate(-width / 2, height / 2);
 
-        Body right = new Body();
+        right = new Body();
         right.addFixture(Geometry.createRectangle(height / 100, height));
         right.setMass(MassType.INFINITE);
         right.translate(width / 2, height / 2);
 
-        Body roof = new Body();
+        roof = new Body();
         roof.addFixture(Geometry.createRectangle(width, width / 100));
         roof.setMass(MassType.INFINITE);
         roof.translate(0, height);
 
         Random random = new Random();
-        int minObsLen = Math.round(width / 20);
-        int maxObsLen = Math.round(width / 3);
-        for (int i = 0; i < 10; i++) {
+
+        float initHeight = height / 10;
+        for (int i = 0; i < 8; i++) {
             Body obs = new Body();
-            int nextLen = minObsLen + random.nextInt(maxObsLen - minObsLen + 1);
-            obs.addFixture(Geometry.createRectangle(nextLen, width / 100));
+            obs.addFixture(Geometry.createRectangle(recLen, width / 100));
             obs.setMass(MassType.INFINITE);
-            int nextMiss = random.nextInt(Math.round(width) / 2 - nextLen / 2) - Math.round(width) / 2 + nextLen / 2;
-            obs.translate(nextMiss, random.nextInt(Math.round(height) + 1));
+            float nextMiss = random.nextInt(15)-7;
+            obs.translate(nextMiss, Math.round(initHeight) * i + 1);
+            int xVel = random.nextInt(5) - 2;
+            while (xVel == 0) {
+                xVel = random.nextInt(5) - 2;
+            }
+            obs.setLinearVelocity(xVel, 0);
             obstaclesList.add(obs);
         }
         obstaclesList.add(left);
@@ -155,6 +166,14 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
             jumpVector.y = jumpVector.y + 3;
             wheel.setLinearVelocity(jumpVector);
         }
+        for (Body body : obstaclesList) {
+            Transform transform = body.getTransform();
+            Vector2 vec = transform.getTransformed(body.getFixture(0).getShape().getCenter());
+            if (vec.x >= width / 2 - recLen || vec.x <= -width / 2 + recLen) {
+                Vector2 xVel = body.getLinearVelocity();
+                body.setLinearVelocity(-xVel.x, xVel.y);
+            }
+        }
         this.world.update(elapsedTime);
     }
 
@@ -162,6 +181,7 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     public List<Body> getObstaclesList() {
         return obstaclesList;
     }
+
     @Override
     public AtomicBoolean getLeftPressed() {
         return leftPressed;
