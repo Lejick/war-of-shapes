@@ -100,7 +100,7 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     @Override
     public void initPlayBody() {
         wheel = new Body();
-        wheel.addFixture(Geometry.createRectangle(width / 40,width / 40), 1.0, 10.0, 0);
+        wheel.addFixture(Geometry.createRectangle(width / 40,width / 40), 5.0, 20.0, 0);
         wheel.setMass(MassType.NORMAL);
         wheel.translate(height / 3, width / 10);
     }
@@ -154,7 +154,7 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
     }
 
     @Override
-    public void update(double elapsedTime) {
+    public synchronized void update(double elapsedTime) {
         if (this.leftPressed.get()) {
             wheel.applyImpulse(new Vector2(-1,0));
         }
@@ -164,7 +164,7 @@ public class MovingPlatformerLevel implements ServerPlatformerLevelIF {
         if (this.jumpPressed.get() && getActionBody().getInContactBodies(false).size() > 0) {
             Vector2 jumpVector = wheel.getLinearVelocity();
             jumpVector.y = jumpVector.y + 3;
-            wheel.setLinearVelocity(jumpVector);
+            wheel.applyImpulse(jumpVector);
         }
         for (Body body : obstaclesList) {
             Transform transform = body.getTransform();
